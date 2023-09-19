@@ -2,6 +2,7 @@ package org.rcbg.afku;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL11;
 
 public class WindowImpl implements Window{
 
@@ -10,14 +11,18 @@ public class WindowImpl implements Window{
     private boolean resizable;
     private boolean vSyncEnabled;
 
-    public WindowImpl(long windowHandle, int width, int height, boolean resizable, boolean vSync) {
+    public WindowImpl(long windowHandle, int width, int height, boolean vSync) {
         this.windowHandle = windowHandle;
         this.width = width;
         this.height = height;
-        this.resizable = resizable;
+        this.resizable = false;
         this.vSyncEnabled = vSync;
         initCallbacks();
-        setWindowOnCenter();
+        if(height == 0 || width == 0){
+            maximiseWindow();
+        } else {
+            setWindowOnCenter();
+        }
         GLFW.glfwMakeContextCurrent(this.windowHandle);
         if(this.vSyncEnabled){
             GLFW.glfwSwapInterval(1);
@@ -34,9 +39,13 @@ public class WindowImpl implements Window{
 
         GLFW.glfwSetKeyCallback(this.windowHandle, (window, key, scancode, action, mods) -> {
             if(key == GLFW.GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE){
-                GLFW.glfwSetWindowShouldClose(window, true);
+                GLFW.glfwSetWindowShouldClose(this.windowHandle, true);
             }
         });
+    }
+
+    public void maximiseWindow(){
+        GLFW.glfwMaximizeWindow(this.windowHandle);
     }
 
     private void setWindowOnCenter(){
@@ -50,5 +59,30 @@ public class WindowImpl implements Window{
 
     public void setCurrentContextForThisWindow() {
         GLFW.glfwMakeContextCurrent(this.windowHandle);
+    }
+
+    public boolean windowShouldClose(){
+        return GLFW.glfwWindowShouldClose(this.windowHandle);
+    }
+
+    public void destroyWindow() {
+        GLFW.glfwDestroyWindow(this.windowHandle);
+    }
+
+    public void update() {
+        GLFW.glfwSwapBuffers(this.windowHandle);
+        GLFW.glfwPollEvents();
+    }
+
+    public void setClearColor(float r, float g, float b, float a){
+        GL11.glClearColor(r, g, b, a);
+    }
+
+    public boolean isKeyPressed(int keycode){
+        return GLFW.glfwGetKey(this.windowHandle, keycode) == GLFW.GLFW_PRESS;
+    }
+
+    public void changeTitle(String title){
+        GLFW.glfwSetWindowTitle(this.windowHandle, title);
     }
 }

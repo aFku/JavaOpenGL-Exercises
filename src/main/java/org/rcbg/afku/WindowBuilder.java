@@ -8,7 +8,6 @@ public class WindowBuilder {
     private String title;
     private int width;
     private int height;
-    private boolean resizable;
     private boolean vSyncEnabled;
 
     public WindowBuilder() {
@@ -19,7 +18,6 @@ public class WindowBuilder {
         this.title = "default";
         this.width = 0;
         this.height = 0;
-        this.resizable = true;
         this.vSyncEnabled = false;
     }
 
@@ -28,23 +26,21 @@ public class WindowBuilder {
         return this;
     }
 
-    public WindowBuilder withWidth(int width) {
+    public WindowBuilder withSize(int width, int height) {
         this.width = width;
-        return this;
-    }
-
-    public WindowBuilder withHeight(int height) {
         this.height = height;
-        return this;
-    }
-
-    public WindowBuilder resizable(boolean resizable){
-        this.resizable = resizable;
         return this;
     }
 
     public WindowBuilder withEnabledVSync(boolean vSync){
         this.vSyncEnabled = vSync;
+        return this;
+    }
+
+    public WindowBuilder withSizeMaximised(){
+        this.width = 100;
+        this.height = 100;
+        GLFW.glfwWindowHint(GLFW.GLFW_MAXIMIZED, GLFW.GLFW_TRUE);
         return this;
     }
 
@@ -54,6 +50,6 @@ public class WindowBuilder {
             throw new RuntimeException("Cannot create window correctly");
         }
 
-        return new WindowImpl(window, this.width, this.height, this.resizable, this.vSyncEnabled);
+        return new WindowImpl(window, this.width, this.height, this.vSyncEnabled);
     }
 }
